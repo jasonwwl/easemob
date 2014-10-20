@@ -8,6 +8,7 @@
             "email": "jasonwx@163.com"
         }
     ],
+    "version":"1.0.0",
     "require": {
         "php-curl-class/php-curl-class": "~2.1",
         "php": ">=5.4.0"
@@ -16,5 +17,6 @@
         "psr-0": {
             "Easemob": "src"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
