@@ -9,7 +9,7 @@
 
     $ composer require jasonwwl/easemob
 
-##快速使用
+##快速使用 
 本项目依赖 [php-curl-class/php-curl-class](https://github.com/php-curl-class/php-curl-class)
 
 注意`easemob/storage`目录要可写，因为需要保存token信息
