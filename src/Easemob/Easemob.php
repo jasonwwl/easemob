@@ -155,7 +155,7 @@ class Easemob
         if (isset($options['msg'])) {
             $data['msg'] = array(
                 'type' => 'txt',
-                'msg' => json_encode($options['msg'])
+                'msg' => strval($options['msg'])
             );
         }
         if (isset($options['ext'])) {
