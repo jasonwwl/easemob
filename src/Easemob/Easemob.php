@@ -7,6 +7,7 @@ use Whoops\Exception\ErrorException;
 class Easemob
 {
     const URL = 'https://a1.easemob.com';
+
 //    const
     private $client_id;
     private $client_secret;
