@@ -14,6 +14,7 @@ class Easemob
     private $org_name;
     private $app_name;
     private $url;
+    private $debug;
 
     /**
      * 初始化环形参数
@@ -24,8 +25,9 @@ class Easemob
      * @param $options ['org_name']
      * @param $options ['app_name']
      */
-    public function __construct($options)
+    public function __construct($options, $debug = false)
     {
+        $this->debug = $debug;
         $paramsMap = array(
             'client_id',
             'client_secret',
@@ -166,6 +168,17 @@ class Easemob
         return $this->contact($url, $data);
     }
 
+    public function getChatMessages($from, $to, $start, $end, $cursor = false)
+    {
+        $ql = "select+*+where+to%3D'{$to}'+and+from%3D'{$from}'+and+timestamp%3C{$end}+and+timestamp%3E{$start}";
+        $ql .= '&limit=2';
+        if (!is_bool($cursor)) {
+            $ql .= '&cursor=' . $cursor;
+        }
+        $url = $this->url . '/chatmessages?ql=' . $ql;
+        return $this->contact($url, '', 'GET');
+    }
+
     /**
      * 获取token
      * @return bool
@@ -240,6 +253,7 @@ class Easemob
         $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
         $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
         $curl->setHeader('Content-Type', 'application/json');
+        $token = "";
         if ($url !== $this->url . '/token') {
             $token = $this->getToken();
             $curl->setHeader('Authorization', 'Bearer ' . $token);
@@ -259,8 +273,14 @@ class Easemob
             }
         }
         $curl->close();
+        if ($this->debug) {
+            echo "URL: {$url}\n Header: {$token} \nBody: \"{$postData}\"\n";
+        }
         if ($curl->error) {
             throw new \ErrorException('CURL Error: ' . $curl->error_message, $curl->error_code);
+        }
+        if ($this->debug) {
+            echo "return: {$curl->raw_response} \n";
         }
         return json_decode($curl->raw_response, true);
     }
