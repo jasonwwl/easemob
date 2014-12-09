@@ -171,7 +171,7 @@ class Easemob
     public function getChatMessages($from, $to, $start, $end, $cursor = false)
     {
         $ql = "select+*+where+to%3D'{$to}'+and+from%3D'{$from}'+and+timestamp%3C{$end}+and+timestamp%3E{$start}";
-        $ql .= '&limit=2';
+        $ql .= '&limit=30';
         if (!is_bool($cursor)) {
             $ql .= '&cursor=' . $cursor;
         }
