@@ -2,7 +2,7 @@
 namespace Easemob;
 
 use Curl\Curl;
-use Whoops\Exception\ErrorException;
+use \ErrorException;
 
 class Easemob
 {
@@ -15,6 +15,7 @@ class Easemob
     private $app_name;
     private $url;
     private $debug;
+    private $storageAdapter;
 
     /**
      * 初始化环形参数
@@ -171,7 +172,7 @@ class Easemob
     public function getChatMessages($from, $to, $start, $end, $cursor = false)
     {
         $ql = "select+*+where+to%3D'{$to}'+and+from%3D'{$from}'+and+timestamp%3C{$end}+and+timestamp%3E{$start}";
-        $ql .= '&limit=30';
+        $ql .= '&limit=300';
         if (!is_bool($cursor)) {
             $ql .= '&cursor=' . $cursor;
         }
@@ -210,6 +211,9 @@ class Easemob
      */
     private function cacheToken($saveToken = false)
     {
+        if ($this->storageAdapter) {
+            return call_user_func($this->storageAdapter, $saveToken);
+        }
         $cacheFilePath = dirname(dirname(dirname(__FILE__))) . '/storage/data';
         if ($saveToken) {
             $saveToken['expires_in'] = $saveToken['expires_in'] + time();
@@ -231,6 +235,17 @@ class Easemob
                 }
             }
             return false;
+        }
+    }
+
+    /**
+     * 设置
+     * @param callable $callback
+     */
+    public function setStorageAdapter($callback)
+    {
+        if (is_callable($callback)) {
+            $this->storageAdapter = $callback;
         }
     }
 
@@ -280,7 +295,7 @@ class Easemob
             throw new \ErrorException('CURL Error: ' . $curl->error_message, $curl->error_code);
         }
         if ($this->debug) {
-            echo "return: {$curl->raw_response} \n";
+//            echo "return: {$curl->raw_response} \n";
         }
         return json_decode($curl->raw_response, true);
     }
