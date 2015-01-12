@@ -211,20 +211,26 @@ class Easemob
      */
     private function cacheToken($saveToken = false)
     {
-        if ($this->storageAdapter) {
-            return call_user_func($this->storageAdapter, $saveToken);
-        }
         $cacheFilePath = dirname(dirname(dirname(__FILE__))) . '/storage/data';
         if ($saveToken) {
             $saveToken['expires_in'] = $saveToken['expires_in'] + time();
-            $fp = @fopen($cacheFilePath, 'w');
-            @fwrite($fp, serialize($saveToken));
-            fclose($fp);
-        } else {
-            $fp = @fopen($cacheFilePath, 'r');
-            if ($fp) {
-                $data = unserialize(fgets($fp));
+            if ($this->storageAdapter) {
+                return call_user_func($this->storageAdapter, serialize($saveToken));
+            } else {
+                $fp = @fopen($cacheFilePath, 'w');
+                @fwrite($fp, serialize($saveToken));
                 fclose($fp);
+            }
+        } else {
+            if ($this->storageAdapter) {
+                $tokenData = call_user_func($this->storageAdapter, false);
+            } else {
+                $fp = @fopen($cacheFilePath, 'r');
+                $tokenData = fgets($fp);
+                fclose($fp);
+            }
+            if ($tokenData) {
+                $data = unserialize($tokenData);
                 if (!isset($data['expires_in']) || !isset($data['access_token'])) {
                     return false;
                 }
